@@ -26,11 +26,18 @@ class SlashCommandsService(handlers: Seq[SlashCommandHandler], executor: Backgro
       executor.submit {
         cmd.handler(req, SlashCommandResponder(req))
       }
-    }
+    } match {
+      case Seq.empty =>
+        // no handler matched
+        Future(
+          Response(Version.Http11, Status.BadRequest)
+        )
 
-    // respond with 200 to tell Slack everything is 👍
-    Future(
-      Response(Version.Http11, Status.Ok)
-    )
+      case _ =>
+        // respond with 200 to tell Slack everything is 👍
+        Future(
+          Response(Version.Http11, Status.Ok)
+        )
+    }
   }
 }
